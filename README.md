@@ -1,38 +1,27 @@
-# Primzahlen-Visualisierung
+# Control4insights 📊
 
-Dieses Python-Skript findet alle Primzahlen bis 100.000 und erstellt verschiedene Visualisierungen.
+**Python-Toolbox für modernes, datengetriebenes Controlling**
 
-## Features
+## 🎯 Über dieses Projekt
 
-- **Effiziente Berechnung**: Verwendet den Sieve of Eratosthenes Algorithmus
-- **Multiple Visualisierungen**:
-  - Verteilung der Primzahlen
-  - Primzahldichte in Intervallen
-  - Abstände zwischen aufeinanderfolgenden Primzahlen
-  - Ulam-Spirale (bis 10.000)
-  - Kumulative Anzahl der Primzahlen
-  - Detaillierte Statistiken
+Control4insights ist eine Sammlung professioneller Python-Anwendungen für das moderne Controlling. Als Business Partner Controller mit Fokus auf Datenanalyse und Automatisierung entwickle ich hier Lösungen, die zeigen, wie klassische Controlling-Aufgaben durch Python-basierte Workflows effizienter und skalierbarer werden.
 
-## Installation
+**Kernkompetenzen, die dieses Repository demonstriert:**
+- Advanced Analytics für Forecasting und Variance Analysis
+- Automatisierung von Reporting-Prozessen und Datenintegration
+- Visualisierung komplexer Finanzdaten für Self-Service Analytics
+- Clean Code und Software Engineering Best Practices im Finance-Kontext
+- Brücke zwischen Controlling-Expertise und technischer Umsetzung
 
-1. Installieren Sie die erforderlichen Pakete:
-```bash
-pip install -r requirements.txt
-```
+## 💼 Praxisrelevanz für Controller
 
-## Verwendung
+Alle Tools und Scripts basieren auf realen Controlling-Herausforderungen:
 
-Führen Sie das Skript aus:
-```bash
-python prime_numbers_visualization.py
-```
+| Use Case | Business Problem | Technische Lösung |
+|----------|-----------------|-------------------|
+| **Variance Analysis** | Manuelle Plan-Ist-Vergleiche zeitintensiv | Automatisierte Abweichungsanalyse mit Root-Cause-Drilling |
+| **Rolling Forecast** | Excel-basierte Forecasts fehleranfällig | ML-gestützte Zeitreihenprognosen mit Konfidenzintervallen |
+| **KPI-Reporting** | Statische Reports ohne Interaktivität | Self-Service Dashboards mit Drill-Down-Funktionalität |
+| **Datenintegration** | Manuelle Datenextraktion aus SAP/Excel | ETL-Pipelines mit Validierung und Fehlerbehandlung |
+| **Ad-hoc Analysen** | Wiederholte manuelle Auswertungen | Wiederverwendbare Analyse-Templates und Notebooks |
 
-Das Skript wird:
-1. Alle Primzahlen bis 100.000 berechnen
-2. Statistiken in der Konsole anzeigen
-3. Eine Visualisierung erstellen und als `prime_numbers_visualization.png` speichern
-4. Die Visualisierung in einem Fenster anzeigen
-
-## Ausgabe
-
-Das Skript generiert eine hochauflösende PNG-Datei mit 6 verschiedenen Visualisierungen der Primzahlen.
