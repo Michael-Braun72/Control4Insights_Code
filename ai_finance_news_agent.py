@@ -576,7 +576,7 @@ def send_pdf_email(
 # ---------------------------------------------------------------------------
 # Haupt-Job
 # ---------------------------------------------------------------------------
-def run_agent(output_dir: Path = DEFAULT_OUTPUT_DIR, email_recipient: str | None = None) -> Path:
+def run_agent(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     """
     Führt den vollständigen News-Agent-Zyklus aus:
     1. Web-Recherche via Claude + Web Search
@@ -615,7 +615,8 @@ def run_agent(output_dir: Path = DEFAULT_OUTPUT_DIR, email_recipient: str | None
     print(f"   Artikel: {len(articles)}")
     print(f"   Dateigröße: {output_path.stat().st_size / 1024:.1f} KB")
 
-    # 3. Optional: PDF per E-Mail versenden
+    # 3. Optional: PDF per E-Mail versenden (Empfänger via EMAIL_TO)
+    email_recipient = os.environ.get("EMAIL_TO", "")
     if email_recipient:
         send_pdf_email(output_path, email_recipient)
 
@@ -631,7 +632,6 @@ def start_weekly_scheduler(
     output_dir: Path,
     weekday: str = "monday",
     time_str: str = "08:00",
-    email_recipient: str | None = None,
 ):
     """
     Startet den wöchentlichen Scheduler.
@@ -646,7 +646,7 @@ def start_weekly_scheduler(
 
     def job():
         try:
-            run_agent(output_dir, email_recipient=email_recipient)
+            run_agent(output_dir)
         except Exception as exc:
             print(f"❌ Fehler bei der Ausführung: {exc}")
 
@@ -670,12 +670,6 @@ Beispiele:
   # Einmalig sofort ausführen
   python ai_finance_news_agent.py --run-now
 
-  # Report erstellen und per E-Mail versenden
-  python ai_finance_news_agent.py --run-now --email empfaenger@beispiel.de
-
-  # Wöchentlichen Scheduler starten (Montag 08:00) mit E-Mail-Versand
-  python ai_finance_news_agent.py --schedule --email empfaenger@beispiel.de
-
   # Anderen Wochentag und Uhrzeit festlegen
   python ai_finance_news_agent.py --schedule --weekday friday --time 07:30
 
@@ -685,6 +679,7 @@ Beispiele:
 E-Mail-Konfiguration (Umgebungsvariablen):
   export EMAIL_FROM='absender@gmx.de'      # Absender-Adresse
   export EMAIL_PASSWORD='dein-passwort'    # Passwort des Absenders
+  export EMAIL_TO='empfaenger@beispiel.de' # Empfänger-Adresse
         """,
     )
     parser.add_argument(
@@ -702,12 +697,6 @@ E-Mail-Konfiguration (Umgebungsvariablen):
         type=Path,
         default=DEFAULT_OUTPUT_DIR,
         help=f"Ausgabeverzeichnis für PDF-Reports (Standard: {DEFAULT_OUTPUT_DIR})",
-    )
-    parser.add_argument(
-        "--email",
-        metavar="ADRESSE",
-        default=None,
-        help="E-Mail-Adresse, an die der PDF-Report gesendet wird (benötigt EMAIL_FROM und EMAIL_PASSWORD)",
     )
     parser.add_argument(
         "--weekday",
@@ -729,10 +718,10 @@ E-Mail-Konfiguration (Umgebungsvariablen):
         sys.exit(1)
 
     if args.run_now:
-        run_agent(args.output_dir, email_recipient=args.email)
+        run_agent(args.output_dir)
 
     if args.schedule:
-        start_weekly_scheduler(args.output_dir, args.weekday, args.time, email_recipient=args.email)
+        start_weekly_scheduler(args.output_dir, args.weekday, args.time)
 
 
 if __name__ == "__main__":
