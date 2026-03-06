@@ -22,9 +22,13 @@ Voraussetzungen:
 import argparse
 import json
 import os
+import smtplib
 import sys
 import time
 from datetime import datetime, timedelta
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from pathlib import Path
 
 import anthropic
@@ -497,9 +501,82 @@ Liefere ausschließlich valides JSON ohne Markdown-Blöcke oder sonstige Erklär
 
 
 # ---------------------------------------------------------------------------
+# E-Mail-Versand
+# ---------------------------------------------------------------------------
+def send_pdf_email(
+    pdf_path: Path,
+    recipient: str,
+    sender: str | None = None,
+    password: str | None = None,
+    smtp_host: str = "mail.gmx.net",
+    smtp_port: int = 587,
+) -> None:
+    """
+    Sendet den erstellten PDF-Report per E-Mail.
+
+    Zugangsdaten können als Parameter übergeben oder über Umgebungsvariablen
+    bereitgestellt werden:
+        EMAIL_FROM      – Absender-Adresse (z. B. deine GMX-Adresse)
+        EMAIL_PASSWORD  – Passwort / App-Passwort des Absender-Kontos
+
+    Args:
+        pdf_path:   Pfad zur PDF-Datei
+        recipient:  Empfänger-E-Mail-Adresse
+        sender:     Absender-Adresse (überschreibt EMAIL_FROM)
+        password:   Passwort (überschreibt EMAIL_PASSWORD)
+        smtp_host:  SMTP-Server (Standard: mail.gmx.net)
+        smtp_port:  SMTP-Port mit STARTTLS (Standard: 587)
+    """
+    sender = sender or os.environ.get("EMAIL_FROM", "")
+    password = password or os.environ.get("EMAIL_PASSWORD", "")
+
+    if not sender or not password:
+        print("⚠️  E-Mail nicht gesendet: EMAIL_FROM und EMAIL_PASSWORD müssen gesetzt sein.")
+        print("   Setze sie mit:")
+        print("     export EMAIL_FROM='deine@adresse.de'")
+        print("     export EMAIL_PASSWORD='dein-passwort'")
+        return
+
+    week_num = datetime.now().isocalendar()[1]
+    year = datetime.now().year
+
+    msg = MIMEMultipart()
+    msg["From"] = sender
+    msg["To"] = recipient
+    msg["Subject"] = f"KI Finance & Controlling News – KW {week_num:02d}/{year}"
+
+    body = (
+        f"Hallo,\n\n"
+        f"anbei findest du den automatisch erstellten KI Finance & Controlling "
+        f"News-Report für KW {week_num:02d}/{year}.\n\n"
+        f"Der Report enthält die wichtigsten Nachrichten und Trends der letzten Woche "
+        f"rund um Künstliche Intelligenz in Finance und Controlling.\n\n"
+        f"Viele Grüße\n"
+        f"Control4Insights KI News Agent"
+    )
+    msg.attach(MIMEText(body, "plain", "utf-8"))
+
+    with open(pdf_path, "rb") as f:
+        attachment = MIMEApplication(f.read(), _subtype="pdf")
+        attachment.add_header(
+            "Content-Disposition", "attachment", filename=pdf_path.name
+        )
+        msg.attach(attachment)
+
+    print(f"\n📧 Sende E-Mail an {recipient} ...")
+    with smtplib.SMTP(smtp_host, smtp_port) as server:
+        server.ehlo()
+        server.starttls()
+        server.login(sender, password)
+        server.sendmail(sender, recipient, msg.as_string())
+
+    print(f"✅ E-Mail erfolgreich gesendet an: {recipient}")
+
+
+# ---------------------------------------------------------------------------
 # Haupt-Job
 # ---------------------------------------------------------------------------
-def run_agent(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
+def run_agent(output_dir: Path = DEFAULT_OUTPUT_DIR, email_recipient: str | None = None) -> Path:
     """
     Führt den vollständigen News-Agent-Zyklus aus:
     1. Web-Recherche via Claude + Web Search
@@ -537,6 +614,11 @@ def run_agent(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     print(f"\n✅ Report erfolgreich erstellt: {output_path}")
     print(f"   Artikel: {len(articles)}")
     print(f"   Dateigröße: {output_path.stat().st_size / 1024:.1f} KB")
+
+    # 3. Optional: PDF per E-Mail versenden
+    if email_recipient:
+        send_pdf_email(output_path, email_recipient)
+
     print("\n" + "=" * 60 + "\n")
 
     return output_path
@@ -545,7 +627,12 @@ def run_agent(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
 # ---------------------------------------------------------------------------
 # Scheduler
 # ---------------------------------------------------------------------------
-def start_weekly_scheduler(output_dir: Path, weekday: str = "monday", time_str: str = "08:00"):
+def start_weekly_scheduler(
+    output_dir: Path,
+    weekday: str = "monday",
+    time_str: str = "08:00",
+    email_recipient: str | None = None,
+):
     """
     Startet den wöchentlichen Scheduler.
 
@@ -559,7 +646,7 @@ def start_weekly_scheduler(output_dir: Path, weekday: str = "monday", time_str: 
 
     def job():
         try:
-            run_agent(output_dir)
+            run_agent(output_dir, email_recipient=email_recipient)
         except Exception as exc:
             print(f"❌ Fehler bei der Ausführung: {exc}")
 
@@ -583,14 +670,21 @@ Beispiele:
   # Einmalig sofort ausführen
   python ai_finance_news_agent.py --run-now
 
-  # Wöchentlichen Scheduler starten (Montag 08:00)
-  python ai_finance_news_agent.py --schedule
+  # Report erstellen und per E-Mail versenden
+  python ai_finance_news_agent.py --run-now --email empfaenger@beispiel.de
+
+  # Wöchentlichen Scheduler starten (Montag 08:00) mit E-Mail-Versand
+  python ai_finance_news_agent.py --schedule --email empfaenger@beispiel.de
 
   # Anderen Wochentag und Uhrzeit festlegen
   python ai_finance_news_agent.py --schedule --weekday friday --time 07:30
 
   # Ausgabeverzeichnis anpassen
   python ai_finance_news_agent.py --run-now --output-dir /pfad/zu/reports
+
+E-Mail-Konfiguration (Umgebungsvariablen):
+  export EMAIL_FROM='absender@gmx.de'      # Absender-Adresse
+  export EMAIL_PASSWORD='dein-passwort'    # Passwort des Absenders
         """,
     )
     parser.add_argument(
@@ -608,6 +702,12 @@ Beispiele:
         type=Path,
         default=DEFAULT_OUTPUT_DIR,
         help=f"Ausgabeverzeichnis für PDF-Reports (Standard: {DEFAULT_OUTPUT_DIR})",
+    )
+    parser.add_argument(
+        "--email",
+        metavar="ADRESSE",
+        default=None,
+        help="E-Mail-Adresse, an die der PDF-Report gesendet wird (benötigt EMAIL_FROM und EMAIL_PASSWORD)",
     )
     parser.add_argument(
         "--weekday",
@@ -629,10 +729,10 @@ Beispiele:
         sys.exit(1)
 
     if args.run_now:
-        run_agent(args.output_dir)
+        run_agent(args.output_dir, email_recipient=args.email)
 
     if args.schedule:
-        start_weekly_scheduler(args.output_dir, args.weekday, args.time)
+        start_weekly_scheduler(args.output_dir, args.weekday, args.time, email_recipient=args.email)
 
 
 if __name__ == "__main__":
