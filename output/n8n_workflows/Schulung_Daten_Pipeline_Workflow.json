@@ -1,0 +1,82 @@
+{
+  "name": "Schulung: Daten-Pipeline → E-Mail Report",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-1",
+      "name": "1. Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 300],
+      "notes": "SCHULUNG: Manueller Start fuer Demo-Zwecke. In Produktion durch Schedule Trigger (z.B. jeden 5. Werktag) oder Webhook ersetzen."
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// SCHULUNG: Beispieldaten generieren\n// In Produktion wird dieser Node durch echte Datenquelle ersetzt\n// ============================================================\n\nconst guv_data = [\n  { Kostenart: 'Umsatz Inland', Plan: 5200000, Ist: 5450000, Typ: 'Revenue' },\n  { Kostenart: 'Umsatz Export', Plan: 3800000, Ist: 3620000, Typ: 'Revenue' },\n  { Kostenart: 'Umsatz Gesamt', Plan: 9000000, Ist: 9070000, Typ: 'Revenue' },\n  { Kostenart: 'Umsatz Marge %', Plan: 0.42, Ist: 0.41, Typ: 'Percentage' },\n  { Kostenart: 'Materialkosten', Plan: 2700000, Ist: 2850000, Typ: 'Cost' },\n  { Kostenart: 'Personalkosten', Plan: 3100000, Ist: 3050000, Typ: 'Cost' },\n  { Kostenart: 'Sonstige Kosten', Plan: 800000, Ist: 920000, Typ: 'Cost' },\n  { Kostenart: 'Kosten Marge %', Plan: 0.73, Ist: 0.75, Typ: 'Percentage' },\n  { Kostenart: 'Abschreibungen', Plan: 450000, Ist: 440000, Typ: 'Cost' },\n  { Kostenart: 'EBIT', Plan: 1950000, Ist: 1810000, Typ: 'Result' }\n];\n\nreturn guv_data.map(row => ({ json: row }));"
+      },
+      "id": "demo-data-1",
+      "name": "2. Demo-Daten erzeugen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [420, 300],
+      "notes": "SCHULUNG: Erzeugt Beispiel-GuV-Daten. Zeigt typische D365-Exportstruktur inkl. Prozentzeilen (die spaeter gefiltert werden muessen). Dieser Node entfaellt in Produktion."
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// SCHULUNG: Datentransformation & Bereinigung\n// Kernlogik einer Controlling-Pipeline\n// ============================================================\n\nconst items = $input.all();\n\n// SCHRITT 1: Prozentzeilen ausfiltern\nconst filtered = items.filter(item => item.json.Typ !== 'Percentage');\n\n// SCHRITT 2: Abweichung berechnen\nconst enriched = filtered.map(item => {\n  const d = item.json;\n  let abweichung;\n  \n  // WICHTIG: Vorzeichenkonvention!\n  // Revenue: Ist > Plan = positiv (gut)\n  // Kosten:  Ist > Plan = negativ (schlecht)\n  if (d.Typ === 'Revenue' || d.Typ === 'Result') {\n    abweichung = d.Ist - d.Plan;\n  } else {\n    abweichung = -(d.Ist - d.Plan);\n  }\n  \n  const abweichung_pct = d.Plan !== 0 ? (abweichung / Math.abs(d.Plan)) * 100 : 0;\n  \n  let ampel;\n  if (abweichung_pct >= 2) ampel = 'gruen';\n  else if (abweichung_pct >= -2) ampel = 'gelb';\n  else ampel = 'rot';\n  \n  return {\n    json: {\n      ...d,\n      Abweichung_EUR: abweichung,\n      Abweichung_Pct: Math.round(abweichung_pct * 10) / 10,\n      Ampel: ampel\n    }\n  };\n});\n\nreturn enriched;"
+      },
+      "id": "transform-1",
+      "name": "3. Daten transformieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 300],
+      "notes": "SCHULUNG: Zentrale Transformationslogik.\n1. Prozentzeilen rausfiltern (typischer D365-Fallstrick)\n2. Abweichung berechnen mit korrekter Vorzeichenkonvention\n3. Ampelbewertung (Rot/Gelb/Gruen) hinzufuegen"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// SCHULUNG: HTML-Report generieren\n// Management-tauglicher E-Mail-Report\n// ============================================================\n\nconst items = $input.all();\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });\n\nconst ampelColor = { 'gruen': '#27ae60', 'gelb': '#f39c12', 'rot': '#e74c3c' };\n\nfunction fmtEUR(val) {\n  return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(val);\n}\nfunction fmtPct(val) {\n  return val.toFixed(1).replace('.', ',');\n}\n\nlet tableRows = '';\nfor (const item of items) {\n  const d = item.json;\n  const color = ampelColor[d.Ampel] || '#95a5a6';\n  const sign = d.Abweichung_EUR >= 0 ? '+' : '';\n  tableRows += `<tr>\n    <td style=\"padding:8px 12px;border-bottom:1px solid #eee;font-weight:${d.Typ==='Result'?'bold':'normal'}\">${d.Kostenart}</td>\n    <td style=\"padding:8px 12px;border-bottom:1px solid #eee;text-align:right\">${fmtEUR(d.Plan)}</td>\n    <td style=\"padding:8px 12px;border-bottom:1px solid #eee;text-align:right\">${fmtEUR(d.Ist)}</td>\n    <td style=\"padding:8px 12px;border-bottom:1px solid #eee;text-align:right;color:${d.Abweichung_EUR>=0?'#27ae60':'#e74c3c'}\">${sign}${fmtEUR(d.Abweichung_EUR)}</td>\n    <td style=\"padding:8px 12px;border-bottom:1px solid #eee;text-align:right\">${sign}${fmtPct(d.Abweichung_Pct)} %</td>\n    <td style=\"padding:8px 12px;border-bottom:1px solid #eee;text-align:center\"><span style=\"display:inline-block;width:16px;height:16px;border-radius:50%;background:${color}\"></span></td>\n  </tr>`;\n}\n\nconst ebit = items.find(i => i.json.Kostenart === 'EBIT');\nconst ebitAbw = ebit ? ebit.json.Abweichung_EUR : 0;\nconst ebitAmpel = ebit ? ebit.json.Ampel : 'gelb';\n\nconst html = `<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head>\n<body style=\"font-family:'Segoe UI',Arial,sans-serif;color:#2c3e50;max-width:800px;margin:0 auto;padding:20px;\">\n  <div style=\"background:linear-gradient(135deg,#2c3e50,#3498db);color:white;padding:24px 32px;border-radius:8px 8px 0 0;\">\n    <h1 style=\"margin:0;font-size:22px;\">Monatlicher Controlling-Report</h1>\n    <p style=\"margin:4px 0 0 0;opacity:0.85;font-size:14px;\">Automatisch erstellt am ${dateStr} | Unternehmen A</p>\n  </div>\n  <div style=\"background:#f8f9fa;padding:20px 32px;border-left:1px solid #e0e0e0;border-right:1px solid #e0e0e0;\">\n    <h2 style=\"font-size:16px;margin:0 0 12px 0;\">Executive Summary</h2>\n    <ul style=\"margin:0;padding-left:20px;line-height:1.8;\">\n      <li>Umsatz leicht ueber Plan (+0,8%) — Inland kompensiert Exportrueckgang</li>\n      <li>Materialkosten ueber Budget (+150 kEUR) — Preiseffekt Halbleiter</li>\n      <li>Personalkosten unter Plan (-50 kEUR) — offene Stelle BU Engineering</li>\n      <li><strong>EBIT ${fmtEUR(Math.abs(ebitAbw))} EUR ${ebitAbw>=0?'ueber':'unter'} Plan</strong> — Ampel: <span style=\"color:${ampelColor[ebitAmpel]};font-weight:bold;\">${ebitAmpel.toUpperCase()}</span></li>\n      <li>Handlungsbedarf: Materialkostenentwicklung im naechsten RF adressieren</li>\n    </ul>\n  </div>\n  <div style=\"padding:20px 32px;border:1px solid #e0e0e0;border-top:none;\">\n    <h2 style=\"font-size:16px;margin:0 0 12px 0;\">Plan-Ist-Vergleich (kumuliert YTD)</h2>\n    <table style=\"width:100%;border-collapse:collapse;font-size:14px;\">\n      <thead><tr style=\"background:#2c3e50;color:white;\">\n        <th style=\"padding:10px 12px;text-align:left;\">Position</th>\n        <th style=\"padding:10px 12px;text-align:right;\">Plan (EUR)</th>\n        <th style=\"padding:10px 12px;text-align:right;\">Ist (EUR)</th>\n        <th style=\"padding:10px 12px;text-align:right;\">Abw. (EUR)</th>\n        <th style=\"padding:10px 12px;text-align:right;\">Abw. (%)</th>\n        <th style=\"padding:10px 12px;text-align:center;\">Status</th>\n      </tr></thead>\n      <tbody>${tableRows}</tbody>\n    </table>\n  </div>\n  <div style=\"background:#f8f9fa;padding:16px 32px;border:1px solid #e0e0e0;border-top:none;border-radius:0 0 8px 8px;font-size:12px;color:#7f8c8d;\">\n    <p style=\"margin:0;\">Automatisch generiert via n8n | Datenquelle: D365 (simuliert) | Schulungsbeispiel</p>\n  </div>\n</body></html>`;\n\nreturn [{ json: { html_report: html, subject: `Controlling-Report ${dateStr} | Unternehmen A`, date: dateStr } }];"
+      },
+      "id": "report-gen-1",
+      "name": "4. HTML-Report generieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "notes": "SCHULUNG: Erzeugt Management-tauglichen HTML-Report mit Executive Summary, Plan-Ist-Tabelle und Ampelbewertung."
+    },
+    {
+      "parameters": {
+        "fromEmail": "controlling@unternehmen-a.de",
+        "toEmail": "={{ $json.toEmail || 'cfo@unternehmen-a.de' }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "html": "={{ $json.html_report }}",
+        "options": {}
+      },
+      "id": "email-send-1",
+      "name": "5. Report per E-Mail senden",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1140, 300],
+      "notes": "SCHULUNG: Versendet HTML-Report per SMTP. Voraussetzung: SMTP-Credentials einrichten. Alternativen: Gmail, Outlook, SendGrid Node.",
+      "credentials": {}
+    }
+  ],
+  "connections": {
+    "1. Manual Trigger": {
+      "main": [[{ "node": "2. Demo-Daten erzeugen", "type": "main", "index": 0 }]]
+    },
+    "2. Demo-Daten erzeugen": {
+      "main": [[{ "node": "3. Daten transformieren", "type": "main", "index": 0 }]]
+    },
+    "3. Daten transformieren": {
+      "main": [[{ "node": "4. HTML-Report generieren", "type": "main", "index": 0 }]]
+    },
+    "4. HTML-Report generieren": {
+      "main": [[{ "node": "5. Report per E-Mail senden", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "Schulung" }, { "name": "Controlling" }, { "name": "Daten-Pipeline" }],
+  "pinData": {},
+  "meta": { "templateCredsSetupCompleted": true }
+}
