@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KI im Controlling – Übungsübersicht</title>
+  <style>
+    :root {
+      --blue-dark:  #1a2a4a;
+      --blue-mid:   #1e3a6e;
+      --blue-light: #2563ab;
+      --accent:     #f0a500;
+      --bg:         #f4f6fa;
+      --card:       #ffffff;
+      --text:       #1c2333;
+      --muted:      #5a6480;
+      --border:     #dde3ef;
+      --green:      #16a34a;
+      --yellow:     #ca8a04;
+      --red:        #dc2626;
+      --tag-bg:     #e8edf8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      padding: 36px 48px 28px;
+      border-bottom: 4px solid var(--accent);
+    }
+    header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -.5px; }
+    header p  { margin-top: 6px; color: #b8c8e0; font-size: .95rem; }
+    .header-meta {
+      display: flex; gap: 24px; margin-top: 20px; flex-wrap: wrap;
+    }
+    .header-meta span {
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: .82rem;
+      color: #d4e0f0;
+    }
+
+    /* ── NAV TABS ── */
+    .nav-tabs {
+      background: var(--blue-dark);
+      display: flex; gap: 2px; padding: 0 48px;
+      overflow-x: auto;
+    }
+    .nav-tab {
+      color: #9ab0cc;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: .85rem;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      transition: all .2s;
+      user-select: none;
+    }
+    .nav-tab:hover { color: #fff; }
+    .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ── MAIN LAYOUT ── */
+    main { max-width: 1100px; margin: 0 auto; padding: 36px 24px; }
+
+    /* ── SECTION ── */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── MODULE HEADER ── */
+    .module-header {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 24px;
+    }
+    .module-icon {
+      width: 52px; height: 52px;
+      background: var(--blue-light);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .module-header-text h2 { font-size: 1.4rem; color: var(--blue-dark); }
+    .module-header-text p  { color: var(--muted); font-size: .9rem; margin-top: 2px; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px 26px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 1rem; font-weight: 700;
+      color: var(--blue-dark);
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .exercise-number {
+      background: var(--blue-light);
+      color: #fff;
+      border-radius: 50%;
+      width: 26px; height: 26px;
+      font-size: .8rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .duration-tag {
+      margin-left: auto;
+      background: var(--tag-bg);
+      color: var(--blue-light);
+      border-radius: 12px;
+      padding: 2px 10px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+
+    /* ── SCENARIO BOX ── */
+    .scenario-box {
+      background: #f0f4fb;
+      border-left: 3px solid var(--blue-light);
+      border-radius: 4px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: .9rem;
+      color: var(--text);
+    }
+    .scenario-label {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--blue-light);
+      letter-spacing: .5px;
+      margin-bottom: 4px;
+    }
+
+    /* ── COLLAPSIBLE ── */
+    .collapse-toggle {
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer;
+      color: var(--blue-light);
+      font-size: .85rem;
+      font-weight: 600;
+      margin-top: 12px;
+      user-select: none;
+    }
+    .collapse-toggle:hover { color: var(--blue-dark); }
+    .collapse-arrow { transition: transform .2s; font-size: .7rem; }
+    .collapse-arrow.open { transform: rotate(90deg); }
+    .collapse-body { display: none; margin-top: 10px; }
+    .collapse-body.open { display: block; }
+
+    /* ── CODE / PROMPT BLOCKS ── */
+    .prompt-block {
+      background: #1e2d45;
+      color: #c9d8f0;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: .83rem;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 8px 0;
+      position: relative;
+    }
+    .prompt-label {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--accent);
+      letter-spacing: .5px;
+      margin-bottom: 6px;
+    }
+    .step-label {
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    /* ── LESSONS / TIPS ── */
+    .tip-box {
+      background: #fef9ee;
+      border: 1px solid #f5d878;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: .87rem;
+      margin-top: 12px;
+    }
+    .tip-box strong { color: #b45309; }
+    .warning-box {
+      background: #fff5f5;
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: .87rem;
+      margin-top: 12px;
+    }
+    .warning-box strong { color: var(--red); }
+
+    /* ── TABLES ── */
+    table { width: 100%; border-collapse: collapse; font-size: .87rem; margin: 12px 0; }
+    th {
+      background: var(--blue-dark);
+      color: #fff;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #f7f9fd; }
+
+    /* ── FILE LINKS ── */
+    .file-links {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin-top: 16px; margin-bottom: 4px;
+    }
+    .file-link {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: .83rem;
+      color: var(--blue-light);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all .2s;
+    }
+    .file-link:hover {
+      background: var(--blue-light);
+      color: #fff;
+      border-color: var(--blue-light);
+    }
+    .file-icon { font-size: 1rem; }
+
+    /* ── OVERVIEW GRID ── */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .overview-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .overview-card:hover {
+      border-color: var(--blue-light);
+      box-shadow: 0 4px 12px rgba(37,99,171,.12);
+      transform: translateY(-2px);
+    }
+    .overview-card .oc-icon { font-size: 1.8rem; margin-bottom: 10px; }
+    .overview-card h3 { font-size: 1rem; color: var(--blue-dark); }
+    .overview-card p  { font-size: .82rem; color: var(--muted); margin-top: 4px; }
+    .overview-card .oc-meta {
+      display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+    }
+    .oc-tag {
+      background: var(--tag-bg);
+      color: var(--blue-light);
+      border-radius: 10px;
+      padding: 2px 9px;
+      font-size: .72rem;
+      font-weight: 600;
+    }
+
+    /* ── COMPARISON TABLE ── */
+    .compare-header { background: var(--blue-mid) !important; }
+
+    /* ── STEPS LIST ── */
+    .steps-list { list-style: none; padding: 0; margin: 8px 0; }
+    .steps-list li {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 6px 0;
+      font-size: .9rem;
+    }
+    .step-num {
+      background: var(--blue-light);
+      color: #fff;
+      border-radius: 50%;
+      width: 22px; height: 22px;
+      font-size: .72rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 28px;
+      color: var(--muted);
+      font-size: .82rem;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      header { padding: 24px 20px; }
+      .nav-tabs { padding: 0 16px; }
+      main { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ HEADER -->
+<header>
+  <h1>KI im Controlling – Übungsübersicht</h1>
+  <p>Alle Übungen, Lösungen und Materialien für die Schulung auf einen Blick.</p>
+  <div class="header-meta">
+    <span>📅 März 2026</span>
+    <span>⏱ Gesamt ca. 145 min</span>
+    <span>🗂 6 Module</span>
+    <span>📄 Alle Dateien im Ordner Examples/</span>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════ NAVIGATION -->
+<nav class="nav-tabs" id="mainNav">
+  <div class="nav-tab active" onclick="showSection('overview')">🏠 Übersicht</div>
+  <div class="nav-tab" onclick="showSection('s1')">① Prompting</div>
+  <div class="nav-tab" onclick="showSection('s2')">② Copilot</div>
+  <div class="nav-tab" onclick="showSection('s3')">③ Claude</div>
+  <div class="nav-tab" onclick="showSection('s4')">④ ChatGPT</div>
+  <div class="nav-tab" onclick="showSection('s5')">⑤ Perplexity</div>
+  <div class="nav-tab" onclick="showSection('s6')">⑥ n8n</div>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════════ OVERVIEW -->
+<div class="section active" id="overview">
+  <div class="module-header">
+    <div class="module-icon">🎯</div>
+    <div class="module-header-text">
+      <h2>Modulübersicht</h2>
+      <p>Empfohlene Reihenfolge und Dateizuordnung aller Schulungsblöcke</p>
+    </div>
+  </div>
+
+  <div class="overview-grid">
+    <div class="overview-card" onclick="showSection('s1')">
+      <div class="oc-icon">✍️</div>
+      <h3>① Prompt-Kompetenz</h3>
+      <p>Prompts systematisch von vage → professionell entwickeln.</p>
+      <div class="oc-meta">
+        <span class="oc-tag">⏱ 20 min</span>
+        <span class="oc-tag">4 Übungen</span>
+        <span class="oc-tag">Einstieg</span>
+      </div>
+    </div>
+    <div class="overview-card" onclick="showSection('s2')">
+      <div class="oc-icon">🔷</div>
+      <h3>② Microsoft 365 Copilot</h3>
+      <p>Excel, Word, Outlook – KI direkt in M365 nutzen.</p>
+      <div class="oc-meta">
+        <span class="oc-tag">⏱ 25 min</span>
+        <span class="oc-tag">5 Übungen</span>
+        <span class="oc-tag">M365-Lizenz</span>
+      </div>
+    </div>
+    <div class="overview-card" onclick="showSection('s3')">
+      <div class="oc-icon">🤖</div>
+      <h3>③ Claude</h3>
+      <p>Analyse, Python-Code, Excel, Sparring-Partner für Controller.</p>
+      <div class="oc-meta">
+        <span class="oc-tag">⏱ 30 min</span>
+        <span class="oc-tag">6 Übungen</span>
+        <span class="oc-tag">Kernwerkzeug</span>
+      </div>
+    </div>
+    <div class="overview-card" onclick="showSection('s4')">
+      <div class="oc-icon">💬</div>
+      <h3>④ ChatGPT</h3>
+      <p>Custom GPTs bauen und Deep Research nutzen.</p>
+      <div class="oc-meta">
+        <span class="oc-tag">⏱ 20 min</span>
+        <span class="oc-tag">4 Übungen</span>
+        <span class="oc-tag">Plus-Lizenz</span>
+      </div>
+    </div>
+    <div class="overview-card" onclick="showSection('s5')">
+      <div class="oc-icon">🔍</div>
+      <h3>⑤ Perplexity</h3>
+      <p>Marktrecherche mit Quellennachweis – kein Halluzinieren.</p>
+      <div class="oc-meta">
+        <span class="oc-tag">⏱ 15 min</span>
+        <span class="oc-tag">4 Übungen</span>
+        <span class="oc-tag">Pro optional</span>
+      </div>
+    </div>
+    <div class="overview-card" onclick="showSection('s6')">
+      <div class="oc-icon">⚙️</div>
+      <h3>⑥ n8n Automatisierung</h3>
+      <p>Workflows ohne Code – KPI-Alerts, API-Verbindungen, Claude-Integration.</p>
+      <div class="oc-meta">
+        <span class="oc-tag">⏱ 30 min</span>
+        <span class="oc-tag">4 Übungen</span>
+        <span class="oc-tag">Lokal / Cloud</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Gesamtübersicht aller Dateien</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Modul</th>
+          <th>Tool</th>
+          <th>Übungsdateien</th>
+          <th>Dauer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1 – Prompting</strong></td>
+          <td>Alle KI-Tools</td>
+          <td>
+            <a class="file-link" href="1_Prompting/Prompt_Uebungen.md">📄 Prompt_Uebungen.md</a>
+            <a class="file-link" href="1_Prompting/Prompt_Vorlagen_Controlling.md">📄 Prompt_Vorlagen_Controlling.md</a>
+          </td>
+          <td>20 min</td>
+        </tr>
+        <tr>
+          <td><strong>2 – Copilot</strong></td>
+          <td>Microsoft 365</td>
+          <td>
+            <a class="file-link" href="2_Copilot/Copilot_Uebungen.md">📄 Copilot_Uebungen.md</a>
+            <a class="file-link" href="2_Copilot/Beispieldaten_AB_Test.csv">📊 Beispieldaten_AB_Test.csv</a>
+            <a class="file-link" href="2_Copilot/Copilot_Excel/KI_im_Controlling_Demo_Daten.xlsx">📗 KI_im_Controlling_Demo_Daten.xlsx</a>
+            <a class="file-link" href="2_Copilot/Copilot_Excel/DB_Rechnung_5J_Simulation_break_even.xlsx">📗 DB_Rechnung_5J_Simulation_break_even.xlsx</a>
+          </td>
+          <td>25 min</td>
+        </tr>
+        <tr>
+          <td><strong>3 – Claude</strong></td>
+          <td>claude.ai</td>
+          <td>
+            <a class="file-link" href="3_Claude/Claude_Analyse_Uebungen.md">📄 Claude_Analyse_Uebungen.md</a>
+            <a class="file-link" href="3_Claude/Beispieldaten_AB_Test.csv">📊 Beispieldaten_AB_Test.csv</a>
+            <a class="file-link" href="vscode://file/C:/Users/micha/claude_projects/schulung-co/KI_im_Controlling/1_Examples/3_Claude/AB_Test_Analyse.ipynb" title="In VS Code öffnen">📓 AB_Test_Analyse.ipynb  ↗ VS Code</a>
+            <a class="file-link" href="3_Claude/Claude_Excel/KI_im_Controlling_Demo_Daten.xlsx">📗 KI_im_Controlling_Demo_Daten.xlsx</a>
+            <a class="file-link" href="3_Claude/Claude_Excel/DB_Rechnung_5J_Simulation_break_even.xlsx">📗 DB_Rechnung_5J_Simulation_break_even.xlsx</a>
+            <a class="file-link" href="vscode://file/C:/Users/micha/claude_projects/schulung-co/KI_im_Controlling/1_Examples/3_Claude/Claude_Excel/DB_Rechnung_Break_Even_Analyse.ipynb" title="In VS Code öffnen">📓 DB_Rechnung_Break_Even_Analyse.ipynb  ↗ VS Code</a>
+          </td>
+          <td>30 min</td>
+        </tr>
+        <tr>
+          <td><strong>4 – ChatGPT</strong></td>
+          <td>ChatGPT Plus</td>
+          <td>
+            <a class="file-link" href="4_ChatGPT/ChatGPT_Uebungen.md">📄 ChatGPT_Uebungen.md</a>
+          </td>
+          <td>20 min</td>
+        </tr>
+        <tr>
+          <td><strong>5 – Perplexity</strong></td>
+          <td>Perplexity Pro</td>
+          <td>
+            <a class="file-link" href="5_Perplexity/Perplexity_Uebungen.md">📄 Perplexity_Uebungen.md</a>
+          </td>
+          <td>15 min</td>
+        </tr>
+        <tr>
+          <td><strong>6 – n8n</strong></td>
+          <td>n8n lokal/Cloud</td>
+          <td>
+            <a class="file-link" href="6_n8n/n8n_Workflow_Uebungen.md">📄 n8n_Workflow_Uebungen.md</a>
+            <a class="file-link" href="6_n8n/n8n_Local_Quickstart.md">📄 n8n_Local_Quickstart.md</a>
+            <a class="file-link" href="6_n8n/N8n mein eigenes Beispiel für Workflow.docx">📝 Eigenes Workflow-Beispiel.docx</a>
+          </td>
+          <td>30 min</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 Beispieldaten: Beispieldaten_AB_Test.csv</div>
+    <p style="font-size:.9rem; color:var(--muted); margin-bottom:12px;">500 synthetische Datensätze aus einem A/B-Test-Szenario (3 Szenarien: Marketing, Pricing, Prozessoptimierung)</p>
+    <table>
+      <thead><tr><th>Spalte</th><th>Beschreibung</th><th>Verwendung</th></tr></thead>
+      <tbody>
+        <tr><td><code>scenario</code></td><td>Marketing / Pricing / Prozess</td><td>Gruppierung</td></tr>
+        <tr><td><code>group</code></td><td>A (Kontrolle) / B (Test)</td><td>A/B-Vergleich</td></tr>
+        <tr><td><code>units</code></td><td>Einheiten / Besucher</td><td>Volumen</td></tr>
+        <tr><td><code>conversions</code></td><td>Anzahl Konversionen</td><td>Effektivität</td></tr>
+        <tr><td><code>revenue</code></td><td>Umsatz in €</td><td>Ergebnisanalyse</td></tr>
+        <tr><td><code>costs</code></td><td>Kosten in €</td><td>Profitabilitätsrechnung</td></tr>
+        <tr><td><code>conversion_rate</code></td><td>Konversionsrate</td><td>KPI</td></tr>
+        <tr><td><code>cost_per_unit</code></td><td>Kosten pro Einheit</td><td>Effizienzvergleich</td></tr>
+      </tbody>
+    </table>
+    <div class="file-links">
+      <a class="file-link" href="2_Copilot/Beispieldaten_AB_Test.csv">📊 Copilot-Version</a>
+      <a class="file-link" href="3_Claude/Beispieldaten_AB_Test.csv">📊 Claude-Version</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SECTION 1: PROMPTING -->
+<div class="section" id="s1">
+  <div class="module-header">
+    <div class="module-icon">✍️</div>
+    <div class="module-header-text">
+      <h2>Modul 1 – Prompt-Kompetenz für Controller</h2>
+      <p>Basis für alle anderen Tools | 20 min | 4 Übungen + Prompt-Bibliothek</p>
+    </div>
+  </div>
+
+  <div class="file-links">
+    <a class="file-link" href="1_Prompting/Prompt_Uebungen.md"><span class="file-icon">📄</span> Prompt_Uebungen.md</a>
+    <a class="file-link" href="1_Prompting/Prompt_Vorlagen_Controlling.md"><span class="file-icon">📄</span> Prompt_Vorlagen_Controlling.md</a>
+  </div>
+
+  <!-- Lernziel -->
+  <div class="card" style="margin-top:16px; background:#f0f4fb; border-color:#c3d0ea;">
+    <div class="card-title" style="color:var(--blue-mid);">🎯 Lernziel</div>
+    <p style="font-size:.9rem;">Prompts systematisch von <em>vage → professionell</em> entwickeln. Die drei Grundregeln: <strong>Rolle zuweisen</strong>, <strong>Format definieren</strong>, <strong>Kontext liefern</strong>.</p>
+  </div>
+
+  <!-- Übung 1 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">1</div>
+      Variance Commentary
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Ausgangssituation</div>
+      Umsatz Q3: Plan 50 Mio. €, Ist 47 Mio. €, Abweichung -3 Mio. € (-6%)<br>
+      Hauptursache: Zwei Großprojekte wurden auf Q4 verschoben.
+    </div>
+
+    <p style="font-size:.9rem; margin:12px 0 8px;">Entwickle den Prompt in <strong>3 Schritten</strong>. Bewerte nach jedem Schritt: Was fehlt noch?</p>
+
+    <div class="step-label">Schritt 1 – Vager Prompt</div>
+    <div class="prompt-block">Schreibe einen Kommentar zur Umsatzabweichung.</div>
+
+    <div class="step-label">Schritt 2 – Mit Kontext</div>
+    <div class="prompt-block">Du bist Controller. Umsatz Q3: Plan 50 Mio. €, Ist 47 Mio. €.
+Schreibe einen Kommentar für den CFO.</div>
+
+    <div class="step-label">Schritt 3 – Vollständiger Prompt (Musterlösung)</div>
+    <div class="prompt-block">Du bist ein erfahrener Controller in der Maschinenvision-Branche.
+Umsatz Q3: Plan 50 Mio. €, Ist 47 Mio. €, Abweichung -3 Mio. € (-6%).
+Hauptursachen: Projektverschiebungen bei 2 Großkunden (je ca. 1,5 Mio. €).
+Schreibe einen Management-Kommentar: max. 4 Sätze, sachlich, mit Ausblick Q4.</div>
+
+    <div class="tip-box">💡 <strong>Diskussion:</strong> Welcher Schritt hat die größte Verbesserung gebracht? Meistens ist es Schritt 2→3: Rolle + Format sind entscheidender als mehr Kontext allein.</div>
+  </div>
+
+  <!-- Übung 2 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">2</div>
+      Kostentreiber erklären – Eigener Prompt
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Ausgangssituation</div>
+      Materialkosten Oktober: Plan 8 Mio. €, Ist 9,2 Mio. € (+15%)<br>
+      Hintergrund: Rohstoffpreise gestiegen, ein Lieferant ausgefallen.
+    </div>
+
+    <p style="font-size:.9rem; margin:10px 0;">Formuliert selbst einen Prompt nach den drei Grundregeln:</p>
+    <ul style="font-size:.9rem; padding-left:20px; margin:8px 0;">
+      <li>Rolle definieren</li>
+      <li>Zahlen mit Kontext eingeben</li>
+      <li>Format vorgeben (Länge, Stil, Empfänger)</li>
+    </ul>
+    <p style="font-size:.85rem; color:var(--muted);">Ziel: Ein Kommentar, den ihr direkt in den Monatsbericht übernehmen könntet.</p>
+
+    <div class="collapse-toggle" onclick="toggleCollapse(this)">
+      <span class="collapse-arrow">▶</span> Musterlösung anzeigen
+    </div>
+    <div class="collapse-body">
+      <div class="prompt-block">Du bist Business Partner Controlling in der Maschinenvision-Industrie.
+Kostenposition: Materialkosten Oktober
+Plan: 8,0 Mio. €, Ist: 9,2 Mio. €, Abweichung: +1,2 Mio. € (+15%)
+Mögliche Ursachen: Kupferpreisanstieg ca. +18%, Lieferantenausfall (Notbeschaffung Spotmarkt)
+Erstelle: 1) Kommentar für CFO (3 Sätze), 2) To-Do-Liste für Ursachenanalyse (5 Punkte)</div>
+    </div>
+  </div>
+
+  <!-- Übung 3 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">3</div>
+      Sensitivitätsanalyse
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Ausgangsdaten (fiktiv)</div>
+      Umsatz: 100 Mio. € | Materialquote: 40% | Personalkosten: 25 Mio. € | EBITDA: 12 Mio. €
+    </div>
+    <p style="font-size:.9rem; margin:10px 0 6px;">Fragestellung: Was passiert mit dem EBITDA wenn Materialkosten +5%, Volumen -3%, Personalkosten +2%?</p>
+
+    <div class="collapse-toggle" onclick="toggleCollapse(this)">
+      <span class="collapse-arrow">▶</span> Musterlösung anzeigen
+    </div>
+    <div class="collapse-body">
+      <div class="prompt-block">Du bist Controller. Analysiere folgende Szenario-Auswirkungen auf das EBITDA:
+Ausgangsbasis: Umsatz 100 Mio. €, Materialquote 40%, PerEx 25 Mio. €, EBITDA 12 Mio. €
+Szenarien:
+- Materialkosten +5%
+- Volumen -3%
+- Personalkosten +2% (Tarifanpassung)
+Erstelle eine Tabelle: Szenario | EBITDA-Impact (€) | EBITDA-Impact (%) | Maßnahme
+Hinweis: Alle Berechnungen zeigen, damit ich prüfen kann.</div>
+      <div class="warning-box">⚠️ <strong>Hinweis:</strong> Ergebnis immer rechnerisch prüfen – KI macht Rechenfehler, besonders bei abhängigen Berechnungen!</div>
+    </div>
+  </div>
+
+  <!-- Übung 4 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">4</div>
+      Prompt-Bibliothek aufbauen
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <p style="font-size:.9rem; margin-bottom:12px;">Notiert euren besten Prompt aus Übung 1–3. Struktur für die Bibliothek:</p>
+    <table>
+      <thead><tr><th>Prompt-Name</th><th>Einsatzbereich</th><th>Prompt-Text (Vorlage)</th></tr></thead>
+      <tbody>
+        <tr><td>Variance Commentary</td><td>Monatsbericht</td><td>Du bist erfahrener Controller in der [BRANCHE]-Branche…</td></tr>
+        <tr><td>Kostentreiber-Kommentar</td><td>Monatsbericht</td><td>Kostenposition: [KOSTENART], Plan: [X], Ist: [X]…</td></tr>
+        <tr><td>Sensitivitätsanalyse</td><td>Ad-hoc-Anfragen</td><td>Ausgangsbasis: Umsatz [X] Mio. €, Materialquote [X]%…</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:.83rem; color:var(--muted); margin-top:10px;">💾 Tipp: Prompt_Vorlagen_Controlling.md enthält fertige Vorlagen für alle Standard-Situationen – direkt kopieren und [WERTE EINFÜGEN] ersetzen.</p>
+    <div class="file-links">
+      <a class="file-link" href="1_Prompting/Prompt_Vorlagen_Controlling.md">📄 Prompt-Bibliothek öffnen</a>
+    </div>
+  </div>
+
+  <!-- Prompt-Bibliothek Kurzreferenz -->
+  <div class="card">
+    <div class="card-title">📚 Prompt-Bibliothek – Schnellreferenz</div>
+    <table>
+      <thead><tr><th>Kategorie</th><th>Prompt-Vorlage</th></tr></thead>
+      <tbody>
+        <tr><td>Variance Commentary</td><td><em>Rolle + Periode + Plan/Ist + Ursachen + Format (max. 4 Sätze, CFO-ready)</em></td></tr>
+        <tr><td>Kostenabweichung</td><td><em>Rolle + Kostenart + Delta + Ursachen → Kommentar + To-Do-Liste</em></td></tr>
+        <tr><td>Sensitivitätsanalyse</td><td><em>Ausgangsbasis + Szenarien → Tabelle mit EBITDA-Impact + Maßnahme</em></td></tr>
+        <tr><td>Management Summary</td><td><em>Headline + Lage + Risiken + Empfehlung (direkt, CFO-ready)</em></td></tr>
+        <tr><td>E-Mail an Stakeholder</td><td><em>Empfänger + Thema + Kernaussage + erwartete Aktion (max. 150 Wörter)</em></td></tr>
+        <tr><td>Python-Code generieren</td><td><em>Dateiname + Spalten + Ziel + Bibliotheken + Anforderungen</em></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SECTION 2: COPILOT -->
+<div class="section" id="s2">
+  <div class="module-header">
+    <div class="module-icon">🔷</div>
+    <div class="module-header-text">
+      <h2>Modul 2 – Microsoft 365 Copilot im Controlling</h2>
+      <p>Excel, Word, Outlook | 25 min | 5 Übungen | Voraussetzung: M365 Copilot-Lizenz</p>
+    </div>
+  </div>
+
+  <div class="file-links">
+    <a class="file-link" href="2_Copilot/Copilot_Uebungen.md"><span class="file-icon">📄</span> Copilot_Uebungen.md</a>
+    <a class="file-link" href="2_Copilot/Beispieldaten_AB_Test.csv"><span class="file-icon">📊</span> Beispieldaten_AB_Test.csv</a>
+    <a class="file-link" href="2_Copilot/Copilot_Excel/KI_im_Controlling_Demo_Daten.xlsx"><span class="file-icon">📗</span> KI_im_Controlling_Demo_Daten.xlsx</a>
+    <a class="file-link" href="2_Copilot/Copilot_Excel/DB_Rechnung_5J_Simulation_break_even.xlsx"><span class="file-icon">📗</span> DB_Rechnung_5J_Simulation_break_even.xlsx</a>
+  </div>
+
+  <!-- Übung 1 -->
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">
+      <div class="exercise-number">1</div>
+      Copilot in Excel: Daten analysieren
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Datei</div>
+      Beispieldaten_AB_Test.csv aus dem Ordner 2_Copilot/ in Excel öffnen → Als Tabelle formatieren (Strg+T)
+    </div>
+    <div class="step-label">Setup</div>
+    <ul class="steps-list">
+      <li><span class="step-num">1</span> CSV in Excel öffnen → Als Tabelle formatieren (Strg+T)</li>
+      <li><span class="step-num">2</span> Copilot öffnen (Home-Menü → Copilot-Symbol)</li>
+    </ul>
+    <div class="step-label">Prompts zum Ausprobieren</div>
+    <div class="prompt-block">Zeige mir eine Zusammenfassung dieser Daten.</div>
+    <div class="prompt-block">Welche Szenarien haben die höchste Conversion Rate?</div>
+    <div class="prompt-block">Erstelle ein Balkendiagramm: Durchschnittliche Revenue nach Scenario und Group.</div>
+    <div class="prompt-block">Welche Zeilen haben die höchsten Kosten pro Unit? Zeige Top 10.</div>
+    <div class="tip-box">🎯 <strong>Ziel:</strong> Erkenntnisse in 2 Minuten – ohne eine Formel selbst zu schreiben.</div>
+  </div>
+
+  <!-- Übung 2 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">2</div>
+      Copilot in Excel: Formeln generieren
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <p style="font-size:.9rem; margin-bottom:10px;">Neue Kennzahlen direkt per Spracheingabe berechnen lassen:</p>
+    <div class="prompt-block">Füge eine neue Spalte "Profit" hinzu: revenue minus costs.</div>
+    <div class="prompt-block">Berechne den Profit-Margin in Prozent und füge ihn als Spalte hinzu.</div>
+    <div class="prompt-block">Markiere alle Zeilen rot, bei denen cost_per_unit über 20 liegt.</div>
+    <div class="tip-box">💡 <strong>Diskussion:</strong> Welche Formeln hat Copilot generiert? Stimmen sie rechnerisch?</div>
+  </div>
+
+  <!-- Übung 3 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">3</div>
+      Copilot in Word: Bericht überarbeiten
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="step-label">Ausgangstext – in Word einfügen</div>
+    <div class="prompt-block" style="font-style:italic; background:#2a1f3d;">"Im dritten Quartal lag der Umsatz bei 47 Millionen Euro, was unter dem geplanten Wert von 50 Millionen Euro lag. Die Differenz von 3 Millionen Euro ist auf verschiedene Faktoren zurückzuführen, unter anderem auf Verschiebungen bei einigen größeren Projekten. Die Situation wird im vierten Quartal beobachtet."</div>
+    <div class="step-label">Copilot-Prompt zur Überarbeitung</div>
+    <div class="prompt-block">Überarbeite diesen Text für ein CFO-Reporting. Sachlich, präzise, max. 3 Sätze,
+keine Passivkonstruktionen, mit konkreter Handlungsempfehlung.</div>
+    <div class="tip-box">💡 <strong>Diskussion:</strong> Vergleich Original vs. Copilot-Version. Was ist besser, was fehlt?</div>
+  </div>
+
+  <!-- Übung 4 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">4</div>
+      Copilot in Outlook: E-Mail-Entwurf
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Situation</div>
+      Du musst dem BU-Leiter erklären, warum der Umsatz 6% unter Plan liegt.
+    </div>
+    <div class="step-label">Neue E-Mail in Outlook → Copilot → "E-Mail verfassen"</div>
+    <div class="prompt-block">Schreibe eine E-Mail an den BU-Leiter.
+Thema: Umsatzabweichung Q3 (-6% vs. Plan, -3 Mio. €)
+Ursache: 2 Projektverschiebungen (je 1,5 Mio. €)
+Ton: Sachlich, lösungsorientiert, Handlungsempfehlung für Q4 enthalten.</div>
+    <div class="tip-box">💡 <strong>Bewertung:</strong> Würdest du die E-Mail so abschicken? Was würdest du ändern?</div>
+  </div>
+
+  <!-- Übung 5 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">5</div>
+      Copilot in Excel: DB-Rechnung & Break-Even analysieren
+      <span class="duration-tag">⏱ ~8 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Dateien</div>
+      <strong>DB_Rechnung_5J_Simulation_break_even.xlsx</strong> und <strong>KI_im_Controlling_Demo_Daten.xlsx</strong> aus dem Ordner <code>2_Copilot/Copilot_Excel/</code> öffnen.
+    </div>
+    <div class="step-label">Aufgabe 1 – DB-Rechnung verstehen (Demo-Daten)</div>
+    <div class="prompt-block">Erkläre mir die Struktur dieser DB-Rechnung.
+Welche Treiber haben den stärksten Einfluss auf den EBITDA?
+Wo liegen die größten Hebel für eine Margenverbesserung?</div>
+    <div class="step-label">Aufgabe 2 – Break-Even-Simulation</div>
+    <div class="prompt-block">Berechne den Break-Even-Umsatz auf Basis dieser Kostenstruktur.
+Was passiert mit dem Break-Even wenn die Fixkosten um 10% steigen?
+Erstelle eine Sensitivitätstabelle: Fixkosten +5%, +10%, +15% vs. Break-Even-Menge.</div>
+    <div class="step-label">Aufgabe 3 – 5-Jahres-Simulation interpretieren</div>
+    <div class="prompt-block">Analysiere die 5-Jahres-Entwicklung in diesem Modell.
+Welche Annahmen sind kritisch? Welche Szenarien sollte ich für das Management vorbereiten?</div>
+    <div class="file-links">
+      <a class="file-link" href="2_Copilot/Copilot_Excel/KI_im_Controlling_Demo_Daten.xlsx">📗 KI_im_Controlling_Demo_Daten.xlsx</a>
+      <a class="file-link" href="2_Copilot/Copilot_Excel/DB_Rechnung_5J_Simulation_break_even.xlsx">📗 DB_Rechnung_5J_Simulation_break_even.xlsx</a>
+    </div>
+    <div class="tip-box">💡 <strong>Hinweis:</strong> Copilot liest direkt in der geöffneten Excel-Datei. Seitenleiste öffnen → Copilot-Symbol → Prompts direkt eingeben. Formeln und Zellbezüge werden automatisch erkannt.</div>
+  </div>
+
+  <!-- Vergleich Copilot vs. Claude -->
+  <div class="card">
+    <div class="card-title">⚖️ Copilot vs. Claude – Schnellvergleich</div>
+    <table>
+      <thead><tr><th>Aspekt</th><th>Copilot</th><th>Claude</th></tr></thead>
+      <tbody>
+        <tr><td>Integration</td><td>Direkt in M365</td><td>Browser / Cowork</td></tr>
+        <tr><td>Excel-Formeln</td><td>✅ Sehr stark (nativ)</td><td>Gut (als Code)</td></tr>
+        <tr><td>Textqualität</td><td>Gut</td><td>✅ Sehr gut</td></tr>
+        <tr><td>Datenanalyse</td><td>Mittel</td><td>✅ Sehr gut (mit Python)</td></tr>
+        <tr><td>Datenschutz</td><td>Enterprise-Tier</td><td>Enterprise-Tier</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SECTION 3: CLAUDE -->
+<div class="section" id="s3">
+  <div class="module-header">
+    <div class="module-icon">🤖</div>
+    <div class="module-header-text">
+      <h2>Modul 3 – Claude als Controlling-Assistent</h2>
+      <p>Analyse, Python-Code, Sparring, Excel | 30 min | 6 Übungen</p>
+    </div>
+  </div>
+
+  <div class="file-links">
+    <a class="file-link" href="3_Claude/Claude_Analyse_Uebungen.md"><span class="file-icon">📄</span> Claude_Analyse_Uebungen.md</a>
+    <a class="file-link" href="3_Claude/Beispieldaten_AB_Test.csv"><span class="file-icon">📊</span> Beispieldaten_AB_Test.csv</a>
+    <a class="file-link" href="vscode://file/C:/Users/micha/claude_projects/schulung-co/KI_im_Controlling/1_Examples/3_Claude/AB_Test_Analyse.ipynb"><span class="file-icon">📓</span> AB_Test_Analyse.ipynb</a>
+    <a class="file-link" href="3_Claude/Claude_Excel/KI_im_Controlling_Demo_Daten.xlsx"><span class="file-icon">📗</span> KI_im_Controlling_Demo_Daten.xlsx</a>
+    <a class="file-link" href="3_Claude/Claude_Excel/DB_Rechnung_5J_Simulation_break_even.xlsx"><span class="file-icon">📗</span> DB_Rechnung_5J_Simulation_break_even.xlsx</a>
+  </div>
+
+  <div class="card" style="margin-top:16px; background:#f0f4fb; border-color:#c3d0ea;">
+    <div class="card-title" style="color:var(--blue-mid);">⚙️ Setup</div>
+    <ul class="steps-list">
+      <li><span class="step-num">1</span> claude.ai im Browser öffnen (oder Claude Desktop / Cowork)</li>
+      <li><span class="step-num">2</span> Kostenloses Konto reicht für Übungen 1, 3, 4, 5</li>
+      <li><span class="step-num">3</span> Claude Pro empfohlen für Übung 2 und 5 (Datei-Upload)</li>
+      <li><span class="step-num">4</span> Jupyter Notebook: <a class="file-link" style="display:inline-flex;" href="vscode://file/C:/Users/micha/claude_projects/schulung-co/KI_im_Controlling/1_Examples/3_Claude/Claude_Excel/DB_Rechnung_Break_Even_Analyse.ipynb" title="In VS Code öffnen">📓 DB_Rechnung_Break_Even_Analyse.ipynb  ↗ VS Code</a></li>
+    </ul>
+  </div>
+
+  <!-- Übung 1 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">1</div>
+      Variance Commentary – Monatsbericht Oktober
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="prompt-block">Du bist ein erfahrener Controller in der Maschinenvision-Branche.
+Monatsbericht Oktober:
+- Umsatz: Plan 18 Mio. €, Ist 16,8 Mio. € (-6,7%)
+- Materialkosten: Plan 7,2 Mio. €, Ist 8,1 Mio. € (+12,5%)
+- PerEx: Plan 4,5 Mio. €, Ist 4,5 Mio. € (on plan)
+- EBITDA: Plan 2,8 Mio. €, Ist 1,3 Mio. € (-53,6%)
+Hintergründe: Umsatz: Projektverschiebung Kunde A (1,2 Mio. €).
+Materialkosten: Kupferpreisanstieg +18% + Lieferantenausfall.
+Erstelle:
+1. Executive Summary (3 Sätze, CFO-ready)
+2. Kommentierungstabelle je KPI (Abweichung | Ursache | Maßnahme)
+3. Risikobewertung für den Rest des Quartals (Ampel: Rot/Gelb/Grün)</div>
+    <div class="warning-box">⚠️ <strong>Rechnerisch prüfen!</strong> EBITDA-Berechnung manuell gegenchecken: Plan = 18 – 7,2 – 4,5 – sonstige Kosten. Passt die -53,6%?</div>
+  </div>
+
+  <!-- Übung 2 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">2</div>
+      CSV-Daten analysieren (Datei-Upload)
+      <span class="duration-tag">⏱ ~8 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Vorbereitung</div>
+      Beispieldaten_AB_Test.csv in Claude hochladen (Claude Pro erforderlich)
+    </div>
+    <div class="prompt-block">Analysiere diese Daten. Was fällt dir auf?</div>
+    <div class="prompt-block">Vergleiche die Conversion Rate zwischen Gruppe A und Gruppe B
+für das Marketing-Szenario. Gibt es einen signifikanten Unterschied?</div>
+    <div class="prompt-block">Welches der drei Szenarien (Marketing, Pricing, Prozess) zeigt
+die beste Performance? Definiere "beste Performance" selbst
+und begründe deine Wahl.</div>
+    <div class="prompt-block">Erstelle eine Python-Funktion, die aus diesem Datensatz
+einen One-Page-Bericht als HTML generiert.</div>
+
+    <div class="collapse-toggle" onclick="toggleCollapse(this)">
+      <span class="collapse-arrow">▶</span> Erwartete Erkenntnisse anzeigen
+    </div>
+    <div class="collapse-body">
+      <ul style="font-size:.9rem; padding-left:20px; line-height:1.9;">
+        <li><strong>Marketing:</strong> Gruppe B hat höhere Revenue, aber auch höhere Costs</li>
+        <li><strong>Pricing:</strong> Gruppe B zeigt höhere Conversion Rates</li>
+        <li><strong>Prozess:</strong> Gruppe A hat längere Cycle Times, aber weniger Errors</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Übung 3 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">3</div>
+      Python-Code generieren
+      <span class="duration-tag">⏱ ~15 min</span>
+    </div>
+    <div class="prompt-block">Erstelle einen Python-Code (Jupyter Notebook-Stil) für folgende Aufgabe:
+
+Ich habe eine CSV-Datei mit folgenden Spalten:
+scenario, group, units, conversions, revenue, costs,
+cycle_time_days, errors, conversion_rate, cost_per_unit
+
+Aufgabe:
+1. Daten laden und bereinigen (fehlende Werte behandeln)
+2. Für jedes Szenario (Marketing, Pricing, Prozess):
+   - Durchschnittswerte je Gruppe A vs. B berechnen
+   - Statistischen Signifikanztest (t-Test) durchführen
+3. Visualisierung: Grouped Bar Chart (Matplotlib oder Plotly)
+4. Executive Summary: Welche Gruppe "gewinnt" je Szenario?
+
+Anforderungen:
+- Kommentierter Code auf Englisch
+- Error Handling für fehlende Spalten
+- Output als druckbares HTML speichern</div>
+    <div class="warning-box">⚠️ <strong>Hinweis:</strong> Code immer in einer Testumgebung ausführen, nie direkt auf Produktivdaten. Generiertes Notebook liegt in 3_Claude/AB_Test_Analyse.ipynb.</div>
+    <div class="file-links">
+      <a class="file-link" href="vscode://file/C:/Users/micha/claude_projects/schulung-co/KI_im_Controlling/1_Examples/3_Claude/AB_Test_Analyse.ipynb">📓 Beispiel-Notebook öffnen</a>
+    </div>
+  </div>
+
+  <!-- Übung 4 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">4</div>
+      Claude als Sparring-Partner
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Szenario</div>
+      Du planst eine Preiserhöhung von 5% für das nächste Jahr.
+    </div>
+    <div class="prompt-block">Ich bin Controller in der Maschinenvision-Branche und plane
+eine Preiserhöhung von 5% für 2026. Spiele den advocatus diaboli:
+Welche 5 Gegenargumente wird mein CFO bringen?
+Und welche 3 datenbasierten Argumente sollte ich vorbereiten?
+Format: Pro/Contra-Tabelle + Empfehlung für die Präsentation.</div>
+  </div>
+
+  <!-- Übung 5 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">5</div>
+      Claude in Excel: DB-Rechnung & Break-Even analysieren
+      <span class="duration-tag">⏱ ~8 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Vorbereitung</div>
+      <strong>DB_Rechnung_5J_Simulation_break_even.xlsx</strong> oder <strong>KI_im_Controlling_Demo_Daten.xlsx</strong> aus <code>3_Claude/Claude_Excel/</code> in Claude hochladen (Claude Pro / Claude.ai Datei-Upload)
+    </div>
+    <div class="step-label">Aufgabe 1 – Datei hochladen und Struktur erfassen</div>
+    <div class="prompt-block">Ich habe dir eine Excel-Datei mit einer DB-Rechnung hochgeladen.
+Erkläre mir die Struktur: Welche Kostenblöcke gibt es, wie ist der Aufbau?
+Identifiziere die wichtigsten KPIs und Treiber.</div>
+    <div class="step-label">Aufgabe 2 – Break-Even-Analyse durchführen</div>
+    <div class="prompt-block">Berechne den Break-Even-Umsatz aus den Daten dieser Datei.
+Zeige den Rechenweg explizit.
+Was sind die 3 kritischsten Stellschrauben für die Erreichung der Gewinnschwelle?</div>
+    <div class="step-label">Aufgabe 3 – Szenarioanalyse generieren</div>
+    <div class="prompt-block">Erstelle auf Basis dieser Datei eine Szenarioanalyse (Base / Best / Worst).
+Variiere: Umsatz ±10%, Materialkosten ±5%, Fixkosten konstant.
+Ausgabe: Tabelle mit EBITDA und Break-Even je Szenario.</div>
+    <div class="file-links">
+      <a class="file-link" href="3_Claude/Claude_Excel/KI_im_Controlling_Demo_Daten.xlsx">📗 KI_im_Controlling_Demo_Daten.xlsx</a>
+      <a class="file-link" href="3_Claude/Claude_Excel/DB_Rechnung_5J_Simulation_break_even.xlsx">📗 DB_Rechnung_5J_Simulation_break_even.xlsx</a>
+      <a class="file-link" href="vscode://file/C:/Users/micha/claude_projects/schulung-co/KI_im_Controlling/1_Examples/3_Claude/Claude_Excel/DB_Rechnung_Break_Even_Analyse.ipynb" title="In VS Code öffnen">📓 DB_Rechnung_Break_Even_Analyse.ipynb  ↗ VS Code</a>
+    </div>
+    <div class="tip-box">💡 <strong>Vergleich Copilot vs. Claude:</strong> Gleiche Datei – gleiche Frage. Unterschied im Output? Copilot arbeitet direkt in Excel (Formeln, Zellen). Claude liest die Daten semantisch und kann komplexere Szenariomodelle erklären und kommentieren.</div>
+  </div>
+
+  <!-- Übung 6 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">6</div>
+      KI scheitern lassen – bewusster Fehlertest
+      <span class="duration-tag">⏱ ~3 min</span>
+    </div>
+    <div class="prompt-block">Wenn Umsatz 50 Mio. € ist und Kosten 55 Mio. €,
+berechne den EBITDA-Prozentsatz vom Umsatz
+unter Berücksichtigung von 3% Abschreibungen
+und 12% Steuern auf den Vorsteuergewinn.</div>
+    <div class="warning-box">⚠️ <strong>Lesson:</strong> Ergebnis kritisch prüfen: Hat Claude den Rechenschritt korrekt ausgeführt? Bei komplexen abhängigen Berechnungen immer manuell gegenchecken – KI rechnet nicht immer korrekt, besonders bei mehrstufigen Abhängigkeiten.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SECTION 4: ChatGPT -->
+<div class="section" id="s4">
+  <div class="module-header">
+    <div class="module-icon">💬</div>
+    <div class="module-header-text">
+      <h2>Modul 4 – ChatGPT: Custom GPTs &amp; Deep Research</h2>
+      <p>Persistente Assistenten &amp; Tiefenrecherche | 20 min | 4 Übungen | ChatGPT Plus (~22 €/Monat)</p>
+    </div>
+  </div>
+
+  <div class="file-links">
+    <a class="file-link" href="4_ChatGPT/ChatGPT_Uebungen.md"><span class="file-icon">📄</span> ChatGPT_Uebungen.md</a>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">🗺️ Wann welches Tool?</div>
+    <table>
+      <thead><tr><th>Aufgabe</th><th>Empfehlung</th></tr></thead>
+      <tbody>
+        <tr><td>Komplexe Analyse, langer Kontext</td><td>✅ Claude</td></tr>
+        <tr><td>Persistenter Assistent mit fester Konfiguration</td><td>✅ ChatGPT (Custom GPT)</td></tr>
+        <tr><td>Tiefenrecherche mit Synthese vieler Quellen</td><td>✅ ChatGPT (Deep Research)</td></tr>
+        <tr><td>Eigene Wissensbasis abfragen</td><td>✅ NotebookLM</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Übung 1 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">1</div>
+      Custom GPT: Eigenen Controlling-Assistenten bauen
+      <span class="duration-tag">⏱ ~8 min</span>
+    </div>
+    <ul class="steps-list">
+      <li><span class="step-num">1</span> chatgpt.com → "Explore GPTs" → "Create"</li>
+      <li><span class="step-num">2</span> Name vergeben: <strong>Controlling-Assistent [Firmenname]</strong></li>
+      <li><span class="step-num">3</span> Instructions konfigurieren (Vorlage unten)</li>
+      <li><span class="step-num">4</span> Testen mit Variance Commentary aus Modul 1</li>
+    </ul>
+    <div class="step-label">System Instructions (Vorlage)</div>
+    <div class="prompt-block">Du bist ein erfahrener Controller in der [BRANCHE]-Industrie.
+
+DEIN KONTEXT:
+- Berichtsstruktur: Monatsbericht mit KPI-Cockpit + Variance Commentary
+- Stil: Sachlich, direkt, CFO-ready – keine Weichspüler-Formulierungen
+- Zahlenformat: Tausendertrennzeichen mit Punkt, Dezimal mit Komma (deutsches Format)
+- Währung: Euro (Mio. €)
+
+IMMER:
+- Abweichungen in absolut und relativ angeben
+- Ursache-Wirkung-Empfehlung-Struktur nutzen
+- Rechenergebnisse explizit zeigen, damit ich prüfen kann
+
+NIE:
+- Echte Firmennamen oder Kundendaten in Beispielen verwenden
+- Ungesicherte Annahmen als Fakten präsentieren</div>
+    <div class="tip-box">💡 <strong>Beobachtung:</strong> Wie unterscheidet sich das Ergebnis vom gleichen Prompt in Standard-ChatGPT?</div>
+  </div>
+
+  <!-- Übung 2 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">2</div>
+      Custom GPT: Wissen hochladen
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Vorbereitung</div>
+      Erstelle ein 1-seitiges Dokument mit anonymisierten Planungsprämissen 2026 (z.B. FX-Kurs, Materialpreisindex, Volumenwachstum)
+    </div>
+    <ul class="steps-list">
+      <li><span class="step-num">1</span> Custom GPT Builder → "Knowledge" → Dokument hochladen</li>
+      <li><span class="step-num">2</span> GPT mit folgenden Prompts testen:</li>
+    </ul>
+    <div class="prompt-block">Welche FX-Annahmen gelten für unsere 2026-Planung?</div>
+    <div class="prompt-block">Wie viel Umsatz würden wir bei 5% Volumenwachstum gegenüber
+dem Vorjahreswert von 100 Mio. € erreichen?</div>
+    <div class="warning-box">🔒 <strong>Datenschutz-Hinweis:</strong> Nur anonymisierte oder nicht-vertrauliche Dokumente hochladen!</div>
+  </div>
+
+  <!-- Übung 3 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">3</div>
+      Deep Research – Marktanalyse Maschinenvision
+      <span class="duration-tag">⏱ ~10 min (Wartezeit inkl.)</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Szenario</div>
+      Vorbereitung auf ein Strategiemeeting zum Thema Maschinenvision-Markt 2026.
+    </div>
+    <div class="prompt-block">Erstelle eine strukturierte Marktanalyse für die Maschinenvision-Industrie 2025/2026.
+Fokus:
+1. Marktgröße und Wachstumsraten (global + DACH)
+2. Top-3-Wachstumstreiber (mit konkreten Zahlen und Quellen)
+3. Technologische Trends (KI-Integration, Edge Computing)
+4. Regulatorische Entwicklungen relevant für europäische Hersteller
+5. Competitive Landscape: 3-4 relevante Player
+Format: Executive Summary (1 Seite) + Detailkapitel + Quellenverzeichnis</div>
+    <div class="tip-box">⏳ <strong>Hinweis:</strong> Deep Research dauert 5–10 Minuten. Ergebnis immer auf Quellenqualität prüfen!</div>
+  </div>
+
+  <!-- Übung 4 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">4</div>
+      System Prompt vs. User Prompt – Experiment
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="step-label">Test A – Standard ChatGPT</div>
+    <div class="prompt-block">Was sind die wichtigsten KPIs für einen Controller in der Maschinenvision?</div>
+    <div class="step-label">Test B – Custom GPT mit Kontext</div>
+    <p style="font-size:.9rem; margin:6px 0;">Gleiche Frage im konfigurierten Custom GPT aus Übung 1.</p>
+    <div class="tip-box">💡 <strong>Beobachtung:</strong> Qualität, Relevanz, Format vergleichen. Was ist der konkrete Mehrwert des System Prompts?</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SECTION 5: PERPLEXITY -->
+<div class="section" id="s5">
+  <div class="module-header">
+    <div class="module-icon">🔍</div>
+    <div class="module-header-text">
+      <h2>Modul 5 – Perplexity: Marktrecherche mit Quellennachweis</h2>
+      <p>Schnelle, belegte Fakten | 15 min | 4 Übungen | Kostenlos oder Pro (~20 €/Monat)</p>
+    </div>
+  </div>
+
+  <div class="file-links">
+    <a class="file-link" href="5_Perplexity/Perplexity_Uebungen.md"><span class="file-icon">📄</span> Perplexity_Uebungen.md</a>
+  </div>
+
+  <div class="card" style="margin-top:16px; background:#f0f4fb; border-color:#c3d0ea;">
+    <div class="card-title" style="color:var(--blue-mid);">💡 Warum Perplexity für Controller?</div>
+    <p style="font-size:.9rem;">Jede Aussage ist mit einer klickbaren Quelle belegt. Keine unbelegten Claims. Kein Halluzinieren. Ideal für: <strong>Planungsannahmen absichern, Wettbewerb tracken, Regulatorik verstehen.</strong></p>
+  </div>
+
+  <!-- Übung 1 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">1</div>
+      Marktdaten für Planungsannahmen
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="prompt-block">Wie hat sich der globale Maschinenvision-Markt 2024 entwickelt?
+Marktgröße, Wachstumsrate, wichtigste Regionen. Mit Quellen.</div>
+    <div class="prompt-block">Was sind die aktuellen Kupfer- und Halbleiterpreisindizes?
+Trend der letzten 12 Monate. Für Beschaffungsplanung relevant.</div>
+    <div class="prompt-block">CSRD-Berichtspflicht 2025: Welche Unternehmen sind betroffen
+und was muss ab wann berichtet werden?</div>
+    <div class="tip-box">✅ <strong>Qualitäts-Check je Antwort:</strong>
+      <ul style="margin-top:6px; padding-left:18px; font-size:.88rem;">
+        <li>Ist die Quelle seriös? (Erstquelle oder Sekundärquelle?)</li>
+        <li>Ist das Datum aktuell genug für eine Planung?</li>
+        <li>Stimmt die Zahl mit deinem Branchenwissen überein?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Übung 2 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">2</div>
+      Wettbewerbsanalyse
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="prompt-block">Wer sind die Top-5-Anbieter im Maschinenvision-Markt in Europa?
+Stärken, Schwächen, jüngste Produktneuheiten 2024/2025. Mit Quellen.</div>
+    <div class="tip-box">🔒 <strong>Perplexity Spaces (Pro-Funktion):</strong> Space "Wettbewerb 2026" erstellen → 3 Konkurrenz-URLs hinterlegen → wöchentliche Abfrage: <em>"Was ist neu bei [Wettbewerber X] in den letzten 2 Wochen?"</em></div>
+  </div>
+
+  <!-- Übung 3 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">3</div>
+      Regulatorik &amp; Compliance
+      <span class="duration-tag">⏱ ~3 min</span>
+    </div>
+    <div class="prompt-block">Was ändert sich 2025/2026 bei der EU-Lieferkettenrichtlinie (CSDDD)?
+Was muss ein mittelständisches Industrieunternehmen tun?</div>
+    <div class="prompt-block">Neue IFRS-Standards 2025: Was ist relevant für das Controlling
+eines deutschen Maschinenbauunternehmens?</div>
+    <div class="tip-box">💡 <strong>Kritische Frage:</strong> Würdest du diese Antwort ohne weitere Prüfung an den CFO weiterleiten? Warum (nicht)?</div>
+  </div>
+
+  <!-- Übung 4 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">4</div>
+      Halluzinations-Test
+      <span class="duration-tag">⏱ ~3 min</span>
+    </div>
+    <p style="font-size:.9rem; margin-bottom:10px;">Stelle eine Frage, bei der du die Antwort bereits kennst:</p>
+    <div class="prompt-block">Was war der Umsatz von [bekanntes börsennotiertes Unternehmen] im Geschäftsjahr 2023?</div>
+    <div class="warning-box">⚠️ <strong>Lesson:</strong> Stimmt die Zahl? Ist die Quelle korrekt? Was passiert wenn du nach einer fiktiven Zahl fragst, die es nicht gibt? Auch Perplexity kann falsch liegen – besonders bei sehr spezifischen Zahlen. <strong>Immer Primärquelle prüfen.</strong></div>
+  </div>
+
+  <!-- Tool-Vergleich -->
+  <div class="card">
+    <div class="card-title">⚖️ Tool-Vergleich: Recherche</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Kriterium</th>
+          <th>Perplexity</th>
+          <th>ChatGPT Deep Research</th>
+          <th>NotebookLM</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Quellenangaben</td><td>✅ Jeder Satz</td><td>Am Ende</td><td>Nur eigene Docs</td></tr>
+        <tr><td>Aktualität</td><td>✅ Heute</td><td>Stunden–Tage</td><td>Eigene Docs</td></tr>
+        <tr><td>Tiefe</td><td>Mittel</td><td>✅ Hoch</td><td>✅ Hoch (eigene Docs)</td></tr>
+        <tr><td>Kosten</td><td>~20 €/Monat</td><td>In ChatGPT Plus</td><td>Kostenlos</td></tr>
+        <tr><td>Beste Use Case</td><td>Schnelle Marktfakten</td><td>Tiefenanalyse</td><td>Eigenes Wissen</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SECTION 6: n8n -->
+<div class="section" id="s6">
+  <div class="module-header">
+    <div class="module-icon">⚙️</div>
+    <div class="module-header-text">
+      <h2>Modul 6 – n8n Workflow-Automatisierung</h2>
+      <p>Workflows ohne Code | 30 min | 4 Übungen | Lokal oder Cloud</p>
+    </div>
+  </div>
+
+  <div class="file-links">
+    <a class="file-link" href="6_n8n/n8n_Workflow_Uebungen.md"><span class="file-icon">📄</span> n8n_Workflow_Uebungen.md</a>
+    <a class="file-link" href="6_n8n/n8n_Local_Quickstart.md"><span class="file-icon">📄</span> n8n_Local_Quickstart.md</a>
+    <a class="file-link" href="6_n8n/N8n mein eigenes Beispiel für Workflow.docx"><span class="file-icon">📝</span> N8n mein eigenes Beispiel für Workflow.docx</a>
+  </div>
+
+  <!-- Eigenes Workflow-Beispiel -->
+  <div class="card" style="margin-top:16px; background:#f0f4fb; border-color:#c3d0ea;">
+    <div class="card-title" style="color:var(--blue-mid);">📝 Eigenes Workflow-Beispiel</div>
+    <p style="font-size:.9rem; margin-bottom:10px;">Das Dokument <strong>„N8n mein eigenes Beispiel für Workflow"</strong> zeigt einen realen, selbst erstellten n8n-Workflow aus der Praxis. Nutze es als Referenz und Diskussionsgrundlage:</p>
+    <ul class="steps-list">
+      <li><span class="step-num">1</span> Dokument öffnen und Workflow-Logik lesen</li>
+      <li><span class="step-num">2</span> Übertrage den Workflow in n8n: Nodes nachbauen</li>
+      <li><span class="step-num">3</span> Diskussion: Was funktioniert? Was würdest du anders machen?</li>
+    </ul>
+    <div class="file-links">
+      <a class="file-link" href="6_n8n/N8n mein eigenes Beispiel für Workflow.docx">📝 N8n mein eigenes Beispiel für Workflow.docx</a>
+    </div>
+  </div>
+
+  <!-- Setup / Quickstart -->
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">🚀 n8n lokal starten – Quickstart</div>
+    <div class="collapse-toggle" onclick="toggleCollapse(this)" style="margin-top:0; margin-bottom:8px;">
+      <span class="collapse-arrow">▶</span> Vollständige Anleitung anzeigen
+    </div>
+    <div class="collapse-body">
+      <div class="step-label">Systemvoraussetzungen prüfen</div>
+      <div class="prompt-block">node --version    # Muss v18.0.0 oder höher sein
+npm --version     # Muss v8.0.0 oder höher sein</div>
+      <div class="step-label">Einmalige Installation</div>
+      <div class="prompt-block">npm install -g n8n</div>
+      <div class="step-label">n8n starten</div>
+      <div class="prompt-block">n8n</div>
+      <p style="font-size:.88rem; margin:8px 0;">Dann im Browser öffnen: <strong>http://localhost:5678</strong></p>
+      <div class="tip-box">💡 Terminal-Fenster <strong>offen lassen</strong> – wird es geschlossen, stoppt n8n. Stoppen mit <strong>Strg+C</strong>.</div>
+      <div class="step-label">Häufige Fehler</div>
+      <table>
+        <thead><tr><th>Fehler</th><th>Lösung</th></tr></thead>
+        <tbody>
+          <tr><td>"n8n" wird nicht erkannt</td><td>npm install -g n8n erneut, Terminal neu starten</td></tr>
+          <tr><td>Port 5678 belegt</td><td>n8n --port 5679</td></tr>
+          <tr><td>Seite lädt nicht</td><td>http:// statt https:// prüfen</td></tr>
+          <tr><td>npm: Berechtigung verweigert</td><td>Terminal als Administrator starten</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Übung 1 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">1</div>
+      Erster Workflow: HTTP-Request → FX-Kurse abrufen
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Lernziel</div>
+      Wie funktioniert ein Node? Wie verbinde ich zwei Nodes?
+    </div>
+    <ul class="steps-list">
+      <li><span class="step-num">1</span> "+ Add node" → "HTTP Request" → Method: GET → URL: <code>https://api.exchangerate-api.com/v4/latest/EUR</code> → Execute node</li>
+      <li><span class="step-num">2</span> Output anschauen: JSON mit aktuellen FX-Kursen</li>
+      <li><span class="step-num">3</span> "+ Add node" → "Set" → Extrahiere: USD, GBP, CHF, JPY</li>
+    </ul>
+    <div class="tip-box">✅ <strong>Ergebnis:</strong> Ein einfacher FX-Rate-Abruf in 5 Minuten. Kann täglich automatisch ausgeführt werden und die Kurse in eine Excel/CSV schreiben.</div>
+  </div>
+
+  <!-- Übung 2 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">2</div>
+      Trigger: Workflow zeitgesteuert starten
+      <span class="duration-tag">⏱ ~5 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Lernziel</div>
+      Workflows automatisch und zeitgesteuert ausführen
+    </div>
+    <ul class="steps-list">
+      <li><span class="step-num">1</span> Ersten Node durch "Schedule Trigger" ersetzen → "Every Day" um 07:00 Uhr</li>
+      <li><span class="step-num">2</span> HTTP Request Node wie in Übung 1 verbinden</li>
+      <li><span class="step-num">3</span> "+ Add node" → "Spreadsheet File" → Werte in CSV speichern</li>
+    </ul>
+    <div class="tip-box">✅ <strong>Ergebnis:</strong> Täglich automatisch aktuelle FX-Kurse in einer CSV-Datei.</div>
+  </div>
+
+  <!-- Übung 3 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">3</div>
+      KI-Integration: Claude analysiert Daten und sendet E-Mail
+      <span class="duration-tag">⏱ ~15 min</span>
+    </div>
+    <div class="scenario-box">
+      <div class="scenario-label">Voraussetzung</div>
+      Claude API Key (über anthropic.com/api) + Gmail / Outlook-Konto
+    </div>
+    <div class="step-label">Workflow-Logik</div>
+    <div class="prompt-block" style="line-height:2;">[ Schedule: Jeden Montag 08:00 ]
+         ↓
+[ Read File: Monatsbericht.csv ]
+         ↓
+[ Claude API: "Analysiere diese Daten, schreibe Kommentar" ]
+         ↓
+[ Gmail / Outlook: Kommentar per E-Mail senden ]</div>
+    <div class="step-label">HTTP Request Node (Claude API) – Konfiguration</div>
+    <ul style="font-size:.88rem; padding-left:20px; line-height:1.9;">
+      <li>URL: <code>https://api.anthropic.com/v1/messages</code></li>
+      <li>Method: POST</li>
+      <li>Authentication: Header Auth → <code>x-api-key: [DEIN_API_KEY]</code></li>
+      <li>Body: JSON mit <code>model: "claude-opus-4-6"</code>, Prompt, Daten</li>
+    </ul>
+  </div>
+
+  <!-- Übung 4 -->
+  <div class="card">
+    <div class="card-title">
+      <div class="exercise-number">4</div>
+      Schwellwert-Alert: KPI unter Zielwert → Slack-Alert
+      <span class="duration-tag">⏱ ~10 min</span>
+    </div>
+    <div class="step-label">Workflow-Logik</div>
+    <div class="prompt-block" style="line-height:2;">[ Schedule: Täglich 09:00 ]
+         ↓
+[ HTTP Request: KPI aus BI-System oder CSV lesen ]
+         ↓
+[ IF Node: KPI &lt; Schwellwert? ]
+         ↓ JA
+[ Claude: Kommentar-Entwurf generieren ]
+         ↓
+[ Slack / E-Mail: Alert senden ]</div>
+    <div class="step-label">IF Node konfigurieren</div>
+    <div class="prompt-block">Value 1: {{ $json.ebitda_margin }}
+Operator: "smaller than"
+Value 2: 0.05   (= 5% EBITDA-Marge)</div>
+  </div>
+
+  <!-- n8n Übersicht -->
+  <div class="card">
+    <div class="card-title">📋 n8n – Kann / Kann nicht</div>
+    <table>
+      <thead>
+        <tr><th>✅ Kann n8n</th><th>❌ Kann n8n NICHT</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Zeitgesteuerte Ausführung</td><td>Eigene KI-Modelle trainieren</td></tr>
+        <tr><td>APIs verbinden (REST/JSON)</td><td>Komplexe Datenbanktransaktionen</td></tr>
+        <tr><td>Dateien lesen/schreiben</td><td>Echtzeitverarbeitung großer Datenmengen</td></tr>
+        <tr><td>E-Mails/Slack senden</td><td>SAP-Direktintegration (ohne API)</td></tr>
+        <tr><td>Claude/ChatGPT API nutzen</td><td>Entscheidungen verantworten</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:14px; font-size:.85rem; color:var(--muted);">
+      🌐 <a href="https://n8n.io" target="_blank" style="color:var(--blue-light);">n8n Cloud</a> (kostenlose Testversion, dann ~20 €/Monat) &nbsp;|&nbsp;
+      <a href="https://n8n.io/workflows" target="_blank" style="color:var(--blue-light);">Workflow-Templates</a> &nbsp;|&nbsp;
+      <a href="https://community.n8n.io" target="_blank" style="color:var(--blue-light);">Community</a>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  KI im Controlling · Schulungsunterlagen · Version 1.0 · März 2026
+</footer>
+
+<script>
+  function showSection(id) {
+    // update sections
+    document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    // update tabs
+    const tabs = document.querySelectorAll('.nav-tab');
+    const order = ['overview','s1','s2','s3','s4','s5','s6'];
+    tabs.forEach((tab, i) => {
+      tab.classList.toggle('active', order[i] === id);
+    });
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function toggleCollapse(trigger) {
+    const arrow = trigger.querySelector('.collapse-arrow');
+    const body  = trigger.nextElementSibling;
+    const open  = body.classList.toggle('open');
+    arrow.classList.toggle('open', open);
+  }
+</script>
+</body>
+</html>
