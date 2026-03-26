@@ -26,18 +26,3 @@ Alle Tools und Scripts basieren auf realen Controlling-Herausforderungen (dies k
 | **Datenintegration** | Manuelle Datenextraktion aus SAP/Excel | ETL-Pipelines mit Validierung und Fehlerbehandlung |
 | **Ad-hoc Analysen** | Wiederholte manuelle Auswertungen | Wiederverwendbare Analyse-Templates und Notebooks |
 
-
-## 📚 KI im Controlling - Schulung
-
-Strukturierte Schulungsunterlagen zum Einsatz von KI-Tools im Controlling. 
-Siehe [`KI_im_Controlling/`](KI_im_Controlling/) für die vollständige Modulübersicht.
-
-| Modul | Thema |
-|-------|-------|
-| [0_Presentation](KI_im_Controlling/0_Presentation/) | Gesamtpräsentation |
-| [1_Prompting](KI_im_Controlling/1_Prompting/) | Prompt Engineering für Controller |
-| [2_Copilot](KI_im_Controlling/2_Copilot/) | Microsoft Copilot |
-| [3_Claude](KI_im_Controlling/3_Claude/) | Anthropic Claude |
-| [4_ChatGPT](KI_im_Controlling/4_ChatGPT/) | OpenAI ChatGPT |
-| [5_Perplexity](KI_im_Controlling/5_Perplexity/) | Perplexity AI |
-| [6_n8n](KI_im_Controlling/6_n8n/) | n8n Workflow-Automatisierung |
