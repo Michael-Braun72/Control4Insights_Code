@@ -41,3 +41,8 @@ Siehe [`KI_im_Controlling/`](KI_im_Controlling/) für die vollständige Modulüb
 | [4_ChatGPT](KI_im_Controlling/4_ChatGPT/) | OpenAI ChatGPT |
 | [5_Perplexity](KI_im_Controlling/5_Perplexity/) | Perplexity AI |
 | [6_n8n](KI_im_Controlling/6_n8n/) | n8n Workflow-Automatisierung |
+
+## Claude Skills - Meine Skill-Bibliothek
+
+85 kuratierte Claude Skills fuer Business Partner Controlling in der Maschinenvision-Industrie.
+Siehe [`claude_skills.md`](claude_skills.md) fuer die vollstaendige Uebersicht mit Beschreibungen und Routing-Regeln.
