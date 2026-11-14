@@ -1,6 +1,6 @@
 # Claude Skills - Meine Skill-Bibliothek
 
-**Kuratierte Sammlung von Claude Skills fuer Business Partner Controlling in der Maschinenvision-Industrie**
+**Kuratierte Sammlung von Claude Skills fuer Business Partner Controlling**
 
 Stand: 14.11.2026 | Anzahl Skills: 85
 
